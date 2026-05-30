@@ -2,6 +2,14 @@
 
 A modern Task Management Application built using Angular and ASP.NET Core Web API following a simplified Clean Architecture approach.
 
+### Login Page
+
+![Login Page](docs/login-page.png)
+
+### Dashboard
+
+![Dashboard](docs/dashboard.png)
+
 ## Features
 
 * User Authentication
