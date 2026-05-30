@@ -188,8 +188,8 @@ http://localhost:4200
 ## Login Credentials
 
 ```text
-Username: admin
-Password: admin123
+Username: samuditha
+Password: samu123
 ```
 
 ---
