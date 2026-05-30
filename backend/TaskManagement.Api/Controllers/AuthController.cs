@@ -1,5 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TaskManagement.Application.DTOs;
+using TaskManagement.Domain.Entities;
+using TaskManagement.Infrastructure.Data;
 
 namespace TaskManagement.Api.Controllers;
 
@@ -7,40 +11,58 @@ namespace TaskManagement.Api.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
+    private readonly AppDbContext _context;
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(
-        IConfiguration configuration,
+        AppDbContext context,
         ILogger<AuthController> logger)
     {
-        _configuration = configuration;
+        _context = context;
         _logger = logger;
     }
 
     [HttpPost("login")]
-    public IActionResult Login(LoginDto dto)
+    public async Task<IActionResult> Login(LoginDto dto)
     {
-        var username = _configuration["AuthSettings:Username"];
-        var password = _configuration["AuthSettings:Password"];
+        var user = await _context.Users
+            .FirstOrDefaultAsync(x => x.Username == dto.Username);
 
-        if (dto.Username == username && dto.Password == password)
+        if (user is null)
         {
-            _logger.LogInformation("User logged in successfully.");
+            _logger.LogWarning("Invalid login attempt for username {Username}", dto.Username);
 
-            return Ok(new
+            return Unauthorized(new
             {
-                success = true,
-                message = "Login successful"
+                success = false,
+                message = "Invalid username or password"
             });
         }
 
-        _logger.LogWarning("Invalid login attempt for username {Username}", dto.Username);
+        var passwordHasher = new PasswordHasher<AppUser>();
 
-        return Unauthorized(new
+        var result = passwordHasher.VerifyHashedPassword(
+            user,
+            user.PasswordHash,
+            dto.Password);
+
+        if (result == PasswordVerificationResult.Failed)
         {
-            success = false,
-            message = "Invalid username or password"
+            _logger.LogWarning("Invalid password attempt for username {Username}", dto.Username);
+
+            return Unauthorized(new
+            {
+                success = false,
+                message = "Invalid username or password"
+            });
+        }
+
+        _logger.LogInformation("User {Username} logged in successfully.", dto.Username);
+
+        return Ok(new
+        {
+            success = true,
+            message = "Login successful"
         });
     }
 }
