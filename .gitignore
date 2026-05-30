@@ -1,12 +1,17 @@
+# Angular
+node_modules/
+dist/
+.angular/
+
+# .NET
 bin/
 obj/
 
-node_modules/
-dist/
-
-.vs/
+# VS Code
 .vscode/
 
-appsettings.Development.json
-
+# Mac
 .DS_Store
+
+# Visual Studio
+.vs/
