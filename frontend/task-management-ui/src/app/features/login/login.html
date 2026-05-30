@@ -1,0 +1,80 @@
+<div class="min-h-screen bg-slate-100 flex items-center justify-center p-6">
+  <div class="w-full max-w-5xl bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-2">
+
+    <div class="hidden lg:flex flex-col justify-between bg-slate-900 text-white p-10">
+      <div>
+        <h1 class="text-4xl font-extrabold tracking-tight">
+  SoftTask
+</h1>
+
+<p class="mt-3 text-slate-300 text-lg">
+  Smart Task Management Platform
+</p>
+      </div>
+
+      <div>
+        <h2 class="text-4xl font-bold leading-tight">
+          Organize tasks.<br />
+          Track progress.<br />
+          Stay productive.
+        </h2>
+
+        <p class="mt-6 text-slate-300">
+          SoftTask helps teams and individuals manage tasks, monitor progress and stay productive through a clean and intuitive workspace.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="p-8 md:p-12">
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold text-slate-900">Welcome back</h2>
+        <p class="text-slate-500 mt-2">
+          Please sign in to continue to your dashboard.
+        </p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="login()" class="space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">
+            Username
+          </label>
+          <input
+            type="text"
+            formControlName="username"
+            placeholder="admin"
+            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">
+            Password
+          </label>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="admin123"
+            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+          {{ errorMessage }}
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-700 transition">
+          Sign In
+        </button>
+      </form>
+
+      <div class="mt-6 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-600">
+        <p class="font-medium text-slate-800 mb-1">Demo Credentials</p>
+        <p>Username: <span class="font-semibold">admin</span></p>
+        <p>Password: <span class="font-semibold">admin123</span></p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,206 @@
+<div class="min-h-screen bg-slate-100">
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+     <div class="flex items-center gap-3">
+  <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold">
+    S
+  </div>
+
+  <div>
+    <h1 class="text-2xl font-bold">SoftTask</h1>
+    <p class="text-xs text-slate-500">
+      Smart Task Management Platform
+    </p>
+  </div>
+</div>
+
+      <button
+        (click)="logout()"
+        class="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-700">
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto p-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border">
+        <p class="text-sm text-slate-500">Total Tasks</p>
+        <h2 class="text-3xl font-bold text-slate-900">{{ tasks.length }}</h2>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl shadow-sm border">
+        <p class="text-sm text-slate-500">Completed</p>
+        <h2 class="text-3xl font-bold text-emerald-600">{{ completedCount }}</h2>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl shadow-sm border">
+        <p class="text-sm text-slate-500">Pending</p>
+        <h2 class="text-3xl font-bold text-amber-600">{{ pendingCount }}</h2>
+      </div>
+    </div>
+
+    <div *ngIf="successMessage" class="mb-4 p-4 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200">
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
+      {{ errorMessage }}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <section class="lg:col-span-2 bg-white rounded-2xl shadow-sm border p-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-xl font-semibold text-slate-900">Tasks</h2>
+            <p class="text-sm text-slate-500">Search, filter and manage tasks</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+          <input
+            type="text"
+            [(ngModel)]="searchText"
+            (input)="applyFilters()"
+            placeholder="Search tasks..."
+            class="border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+
+          <select
+            [(ngModel)]="filterStatus"
+            (change)="applyFilters()"
+            class="border border-slate-300 rounded-lg px-3 py-2">
+            <option value="all">All Tasks</option>
+            <option value="completed">Completed</option>
+            <option value="pending">Pending</option>
+          </select>
+
+          <select
+            [(ngModel)]="sortBy"
+            (change)="applyFilters()"
+            class="border border-slate-300 rounded-lg px-3 py-2">
+            <option value="created">Newest First</option>
+            <option value="title">Title</option>
+            <option value="dueDate">Due Date</option>
+          </select>
+        </div>
+
+        <div *ngIf="filteredTasks.length === 0" class="text-center py-12 text-slate-500">
+          No tasks found.
+        </div>
+
+        <div class="space-y-4">
+          <div
+            *ngFor="let task of filteredTasks"
+            class="border border-slate-200 rounded-xl p-4 hover:shadow-md transition">
+
+            <div class="flex justify-between gap-4">
+              <div>
+                <h3 class="text-lg font-semibold text-slate-900">
+                  {{ task.title }}
+                </h3>
+
+                <p class="text-slate-600 mt-1">
+                  {{ task.description || 'No description' }}
+                </p>
+
+                <p class="text-sm text-slate-500 mt-2">
+                  Due: {{ task.dueDate ? (task.dueDate | date:'mediumDate') : 'Not set' }}
+                </p>
+              </div>
+
+              <span
+                class="h-fit px-3 py-1 rounded-full text-sm font-medium"
+                [ngClass]="task.isCompleted ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'">
+                {{ task.isCompleted ? 'Completed' : 'Pending' }}
+              </span>
+            </div>
+
+            <div class="flex gap-3 mt-4">
+              <button
+                (click)="editTask(task)"
+                class="px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100">
+                Edit
+              </button>
+
+              <button
+                *ngIf="!task.isCompleted"
+                (click)="markComplete(task.id)"
+                class="px-3 py-2 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100">
+                Complete
+              </button>
+
+              <button
+                (click)="deleteTask(task.id)"
+                class="px-3 py-2 rounded-lg bg-red-50 text-red-700 hover:bg-red-100">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-white rounded-2xl shadow-sm border p-6">
+        <h2 class="text-xl font-semibold text-slate-900 mb-1">
+          {{ editingTaskId ? 'Edit Task' : 'Create Task' }}
+        </h2>
+
+        <p class="text-sm text-slate-500 mb-6">
+          Add or update task details
+        </p>
+
+        <form [formGroup]="taskForm" (ngSubmit)="saveTask()" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+              Title
+            </label>
+            <input
+              formControlName="title"
+              type="text"
+              class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+              Description
+            </label>
+            <textarea
+              formControlName="description"
+              rows="4"
+              class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+              Due Date
+            </label>
+            <input
+              formControlName="dueDate"
+              type="date"
+              class="w-full border border-slate-300 rounded-lg px-3 py-2">
+          </div>
+
+          <label class="flex items-center gap-2 text-sm text-slate-700">
+            <input type="checkbox" formControlName="isCompleted">
+            Mark as completed
+          </label>
+
+          <div class="flex gap-3 pt-3">
+            <button
+              type="submit"
+              class="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">
+              {{ editingTaskId ? 'Update Task' : 'Create Task' }}
+            </button>
+
+            <button
+              type="button"
+              (click)="resetForm()"
+              class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">
+              Clear
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+</div>
