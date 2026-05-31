@@ -11,19 +11,23 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(request: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, request).pipe(
-      tap(response => {
-        if (response.success) {
-          localStorage.setItem('isLoggedIn', 'true');
-        }
-      })
-    );
-  }
+ login(request: LoginRequest): Observable<LoginResponse> {
+  return this.http.post<LoginResponse>(`${this.apiUrl}/login`, request).pipe(
+    tap(response => {
+      if (response.success) {
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('username', request.username);
+        localStorage.setItem('password', request.password);
+      }
+    })
+  );
+}
 
-  logout(): void {
-    localStorage.removeItem('isLoggedIn');
-  }
+ logout(): void {
+  localStorage.removeItem('isLoggedIn');
+  localStorage.removeItem('username');
+  localStorage.removeItem('password');
+}
 
   isLoggedIn(): boolean {
     return localStorage.getItem('isLoggedIn') === 'true';

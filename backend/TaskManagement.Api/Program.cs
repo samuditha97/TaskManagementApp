@@ -38,9 +38,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseCors("AllowAngularApp");
+
+app.UseMiddleware<AuthMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -62,6 +64,7 @@ using (var scope = app.Services.CreateScope())
         context.SaveChanges();
     }
 }
+
 app.MapControllers();
 
 app.Run();

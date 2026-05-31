@@ -11,27 +11,49 @@ export class TaskService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Task[]> {
-    return this.http.get<Task[]>(this.apiUrl);
-  }
+    private getAuthHeaders() {
+  const username = localStorage.getItem('username') ?? '';
+  const password = localStorage.getItem('password') ?? '';
 
-  getById(id: number): Observable<Task> {
-    return this.http.get<Task>(`${this.apiUrl}/${id}`);
-  }
+  return {
+    Authorization: 'Basic ' + btoa(`${username}:${password}`)
+  };
+}
 
-  create(task: TaskCreate): Observable<Task> {
-    return this.http.post<Task>(this.apiUrl, task);
-  }
+ getAll(): Observable<Task[]> {
+  return this.http.get<Task[]>(this.apiUrl, {
+    headers: this.getAuthHeaders()
+  });
+}
 
-  update(id: number, task: TaskUpdate): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, task);
-  }
+getById(id: number): Observable<Task> {
+  return this.http.get<Task>(`${this.apiUrl}/${id}`, {
+    headers: this.getAuthHeaders()
+  });
+}
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
+create(task: TaskCreate): Observable<Task> {
+  return this.http.post<Task>(this.apiUrl, task, {
+    headers: this.getAuthHeaders()
+  });
+}
 
-  markAsCompleted(id: number): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${id}/complete`, {});
-  }
+update(id: number, task: TaskUpdate): Observable<void> {
+  return this.http.put<void>(`${this.apiUrl}/${id}`, task, {
+    headers: this.getAuthHeaders()
+  });
+}
+
+delete(id: number): Observable<void> {
+  return this.http.delete<void>(`${this.apiUrl}/${id}`, {
+    headers: this.getAuthHeaders()
+  });
+}
+
+markAsCompleted(id: number): Observable<void> {
+  return this.http.patch<void>(`${this.apiUrl}/${id}/complete`, {}, {
+    headers: this.getAuthHeaders()
+  });
+}
+
 }
